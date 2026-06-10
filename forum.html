@@ -342,7 +342,7 @@
 // ════════════════════════════════════════════════════════════
 //  CONFIGURACIÓN — edita estas dos líneas
 // ════════════════════════════════════════════════════════════
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpN67lXr5EZ89yZe-oDaf81hh34I6JwrmrhkLPnUbJ1ozW3gGj-_rHrbAzLWft-WXm/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhluN7Oh2iKIaSkBUGl2hxAs0qjGsUn7kRpXRhZjPW4azIs1n1Ow-OqAYfeamafEmi/exec";
 let   USUARIO    = "Usuario"; // se sobreescribe desde App Inventor
 
 // ════════════════════════════════════════════════════════════
@@ -365,7 +365,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   } catch(e) {}
   document.getElementById("header-sub").textContent =
-    "Hola " + USUARIO + " 👋 Comparte y conecta";
+    "Hola " + USUARIO + " 👋 Comparteix i connecta";
   cargarPosts();
 });
 
@@ -486,7 +486,7 @@ async function cargarReplies(postId) {
     const data = await api({ action:"getReplies", post_id: postId });
     renderReplies(postId, data.replies || []);
   } catch(e) {
-    sec.innerHTML = "<p style='padding:10px;color:var(--text2);font-size:13px'>Error al cargar resposts.</p>";
+    sec.innerHTML = "<p style='padding:10px;color:var(--text2);font-size:13px'>Error al carregar respostes.</p>";
   }
 }
 
@@ -516,7 +516,7 @@ function renderReplies(postId, replies) {
   sec.innerHTML = lista + `
   <div class="reply-input-row">
     <textarea class="reply-input" id="reply-input-${postId}"
-      placeholder="Escribe tu respost…" rows="2" maxlength="300"></textarea>
+      placeholder="Escriu la teva respost…" rows="2" maxlength="300"></textarea>
     <button class="reply-send" onclick="enviarReply('${postId}')">➤</button>
   </div>`;
 }
@@ -537,7 +537,7 @@ async function enviarReply(postId) {
       const el = document.querySelector(`#post-${postId} .reply-count`);
       if (el) el.textContent = post.reply_count + " respost" + (post.reply_count!==1?"s":"");
     }
-    mostrarToast("Respuesta publicada ✓");
+    mostrarToast("Resposta publicada ✓");
   } catch(e) {
     mostrarToast("Error al publicar respost");
     inp.disabled = false;
@@ -662,12 +662,12 @@ function selCat(el, cat) {
 
 async function publicarPost() {
   const texto = document.getElementById("new-post-text").value.trim();
-  if (!texto) { mostrarToast("Escribe algo primero 😊"); return; }
+  if (!texto) { mostrarToast("Escriu quelcom primer 😊"); return; }
   cerrarModal();
   try {
     await api({ action:"addPost", autor:USUARIO, texto, categoria:modalCat });
     document.getElementById("new-post-text").value = "";
-    mostrarToast("¡Post publicado! 🎉");
+    mostrarToast("Post publicat! 🎉");
     cargarPosts();
   } catch(e) {
     mostrarToast("Error al publicar");
@@ -678,20 +678,20 @@ async function publicarPost() {
 //  Borrar
 // ════════════════════════════════════════════════════════════
 async function borrarPost(id) {
-  if (!confirm("¿Eliminar este post?")) return;
+  if (!confirm("Eliminar aquest post?")) return;
   try {
     await api({ action:"deletePost", id });
     document.getElementById("post-" + id)?.remove();
-    mostrarToast("Post eliminado");
+    mostrarToast("Post eliminat");
   } catch(e) { mostrarToast("Error al eliminar"); }
 }
 
 async function borrarReply(postId, id) {
-  if (!confirm("¿Eliminar esta respost?")) return;
+  if (!confirm("Eliminar aquesta respost?")) return;
   try {
     await api({ action:"deleteReply", id });
     document.getElementById("reply-" + id)?.remove();
-    mostrarToast("Respuesta eliminada");
+    mostrarToast("Respost eliminada");
   } catch(e) { mostrarToast("Error al eliminar"); }
 }
 
