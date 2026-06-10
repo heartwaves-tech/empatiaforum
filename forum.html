@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ca">
+<html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Fòrum EmpatIA</title>
+<title>Foro EmpatIA</title>
 <style>
   :root {
     --bg:       #f0f7fa;
@@ -12,14 +12,13 @@
     --primary:  #00a8d8;
     --primary-light: #d4f0f9;
     --primary-dark:  #0088b5;
-    --accent:   #1fbcd4;
-    --text:     #1a3a47;
-    --text2:    #4a6b7d;
+    --text:     #1a1a2e;
+    --text2:    #5c5c7a;
     --border:   #c5e3ed;
     --danger:   #e05252;
     --emoji-bar:#e8f4f9;
     --radius:   14px;
-    --shadow:   0 2px 12px rgba(0,168,216,0.08);
+    --shadow:   0 2px 12px rgba(0,168,216,0.10);
   }
   * { box-sizing:border-box; margin:0; padding:0; }
   body {
@@ -30,16 +29,18 @@
     min-height: 100vh;
   }
 
+  /* ── Header ── */
   .header {
-    background: linear-gradient(135deg, #00a8d8 0%, #1fbcd4 100%);
+    background: var(--primary);
     color: #fff;
     padding: 14px 16px 10px;
     position: sticky; top: 0; z-index: 100;
-    box-shadow: 0 2px 8px rgba(0,168,216,0.2);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
   }
   .header h1 { font-size: 18px; font-weight: 700; letter-spacing:.3px; }
-  .header p  { font-size: 12px; opacity:.85; margin-top:2px; }
+  .header p  { font-size: 12px; opacity:.8; margin-top:2px; }
 
+  /* ── Categorías ── */
   .cats {
     display: flex; gap: 6px; overflow-x: auto;
     padding: 10px 14px; background: var(--surface);
@@ -58,18 +59,19 @@
     background: var(--primary); color: #fff; border-color: var(--primary);
   }
 
+  /* ── Botón nuevo post ── */
   .fab {
     position: fixed; bottom: 20px; right: 18px; z-index: 200;
     width: 54px; height: 54px; border-radius: 50%;
-    background: linear-gradient(135deg, #00a8d8 0%, #1fbcd4 100%); 
-    color: #fff;
+    background: var(--primary); color: #fff;
     font-size: 26px; border: none; cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0,168,216,0.35);
+    box-shadow: 0 4px 16px rgba(0,168,216,0.4);
     display: flex; align-items:center; justify-content:center;
     transition: transform .15s;
   }
   .fab:active { transform: scale(.92); }
 
+  /* ── Lista de posts ── */
   .feed { padding: 12px 14px 90px; }
 
   .post-card {
@@ -104,6 +106,7 @@
     padding:2px 0; margin-left:6px;
   }
 
+  /* ── Barra de emojis ── */
   .emoji-bar {
     display: flex; gap: 4px; padding: 8px 14px;
     background: var(--emoji-bar);
@@ -130,6 +133,7 @@
     cursor: pointer; color: var(--text2);
   }
 
+  /* ── Footer del post ── */
   .post-footer {
     display: flex; align-items:center; gap: 6px;
     padding: 8px 14px; border-top: 1px solid var(--border);
@@ -143,6 +147,7 @@
     font-size: 12px; color: var(--text2); margin-left: auto;
   }
 
+  /* ── Sección de replies ── */
   .replies-section {
     background: var(--surface2);
     border-top: 1px solid var(--border);
@@ -173,6 +178,7 @@
     background:var(--primary-light); border-color:var(--primary); color:var(--primary);
   }
 
+  /* ── Input de nueva reply ── */
   .reply-input-row {
     display:flex; gap:8px; margin-top:6px;
   }
@@ -189,6 +195,7 @@
     cursor:pointer; flex-shrink:0;
   }
 
+  /* ── Modal nuevo post ── */
   .modal-overlay {
     display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45);
     z-index:300; align-items:flex-end; justify-content:center;
@@ -231,6 +238,7 @@
     background:none; color:var(--text2); font-size:15px; cursor:pointer;
   }
 
+  /* ── Picker de emojis ── */
   .emoji-picker {
     display:none; position:fixed; z-index:400;
     background:var(--surface); border-radius:14px;
@@ -246,6 +254,7 @@
   }
   .ep-btn:active { transform:scale(.85); }
 
+  /* ── Estado vacío ── */
   .empty {
     text-align:center; padding:50px 20px;
     color:var(--text2);
@@ -253,6 +262,7 @@
   .empty .icon { font-size:48px; margin-bottom:12px; }
   .empty p { font-size:15px; }
 
+  /* ── Loader ── */
   .loader {
     display:flex; justify-content:center; padding:30px;
   }
@@ -295,6 +305,7 @@
 
 <button class="fab" onclick="abrirModal()">＋</button>
 
+<!-- Modal nuevo post -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <h2>✏️ Nou post</h2>
@@ -313,6 +324,7 @@
   </div>
 </div>
 
+<!-- Emoji picker flotante -->
 <div class="emoji-picker" id="emoji-picker">
   <button class="ep-btn" onclick="elegirEmoji('👍')">👍</button>
   <button class="ep-btn" onclick="elegirEmoji('❤️')">❤️</button>
@@ -327,65 +339,65 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxF3e-4WPlnNNuSYpVo3edaYquLyWKajLbHccyekdH9NBOhuxis_HuVkONzpijOKo0M/exec";
-let USUARIO = "Usuari";
+// ════════════════════════════════════════════════════════════
+//  CONFIGURACIÓN — edita estas dos líneas
+// ════════════════════════════════════════════════════════════
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpN67lXr5EZ89yZe-oDaf81hh34I6JwrmrhkLPnUbJ1ozW3gGj-_rHrbAzLWft-WXm/exec";
+let   USUARIO    = "Usuario"; // se sobreescribe desde App Inventor
 
+// ════════════════════════════════════════════════════════════
+//  Estado global
+// ════════════════════════════════════════════════════════════
 let catActual  = "Tots";
 let modalCat   = "Suport";
-let pickerCtx  = null;
+let pickerCtx  = null; // { postId, replyId }
 let postsCache = [];
-let requestId  = 0;
-let pendingCallbacks = {};
 
-function llamarAppInventor(action, params, callback) {
-  const id = ++requestId;
-  if (callback) pendingCallbacks[id] = callback;
-  const cmd = JSON.stringify({ action, params, id });
-  if (window.procesarForumRequest) {
-    window.procesarForumRequest(cmd);
-  } else {
-    console.warn("procesarForumRequest no disponible");
-  }
-}
-
-function forumRespuesta(data) {
-  const obj = typeof data === "string" ? JSON.parse(data) : data;
-  const cb = pendingCallbacks[obj.id];
-  if (cb) {
-    delete pendingCallbacks[obj.id];
-    cb(obj.result);
-  }
-}
-
+// ════════════════════════════════════════════════════════════
+//  Recibir usuario desde App Inventor
+//  En App Inventor: WebViewer1.WebViewString = nombreUsuario
+// ════════════════════════════════════════════════════════════
 document.addEventListener("DOMContentLoaded", () => {
   try {
-    if (window.usuarioDelApp) {
-      USUARIO = window.usuarioDelApp;
+    if (window.AppInventor) {
+      const wvStr = AppInventor.getWebViewString();
+      if (wvStr) USUARIO = wvStr;
     }
   } catch(e) {}
   document.getElementById("header-sub").textContent =
-    "Hola " + USUARIO + " 👋 Comparteix i connecta";
+    "Hola " + USUARIO + " 👋 Comparte y conecta";
   cargarPosts();
 });
 
-function cargarPosts() {
+// ════════════════════════════════════════════════════════════
+//  API helper
+// ════════════════════════════════════════════════════════════
+async function api(params) {
+  const url = SCRIPT_URL + "?" + new URLSearchParams(params);
+  const res  = await fetch(url);
+  return res.json();
+}
+
+// ════════════════════════════════════════════════════════════
+//  Cargar posts
+// ════════════════════════════════════════════════════════════
+async function cargarPosts() {
   document.getElementById("feed").innerHTML =
     '<div class="loader"><div class="spinner"></div></div>';
-  llamarAppInventor("getPosts", { categoria: catActual }, (data) => {
-    if (data && data.ok) {
-      postsCache = data.posts || [];
-      renderPosts(postsCache);
-    } else {
-      document.getElementById("feed").innerHTML =
-        '<div class="empty"><div class="icon">⚠️</div><p>No s\'ha pogut carregar el fòrum.<br>Revisa la connexió.</p></div>';
-    }
-  });
+  try {
+    const data = await api({ action:"getPosts", categoria: catActual });
+    postsCache = data.posts || [];
+    renderPosts(postsCache);
+  } catch(e) {
+    document.getElementById("feed").innerHTML =
+      '<div class="empty"><div class="icon">⚠️</div><p>No se pudo cargar el foro.<br>Revisa tu conexión.</p></div>';
+  }
 }
 
 function renderPosts(posts) {
   const feed = document.getElementById("feed");
   if (!posts.length) {
-    feed.innerHTML = '<div class="empty"><div class="icon">🌱</div><p>Encara no hi ha posts.<br>Sigues el primer a compartir!</p></div>';
+    feed.innerHTML = '<div class="empty"><div class="icon">🌱</div><p>Aún no hay posts en esta categoría.<br>¡Sé el primero en compartir!</p></div>';
     return;
   }
   feed.innerHTML = posts.map(p => renderPostCard(p)).join("");
@@ -413,13 +425,13 @@ function renderPostCard(p) {
     </div>
     <div class="emoji-bar">
       ${emojisBtns}
-      <button class="emoji-add" onclick="abrirPicker('${p.id}','',event)" title="Afegir reacció">＋😊</button>
+      <button class="emoji-add" onclick="abrirPicker('${p.id}','',event)" title="Añadir reacción">＋😊</button>
     </div>
     <div class="post-footer">
       <button class="btn-reply" onclick="toggleReplies('${p.id}')">
         💬 Respondre
       </button>
-      <span class="reply-count">${p.reply_count} respost${p.reply_count!==1?"es":""}</span>
+      <span class="reply-count">${p.reply_count} respost${p.reply_count!==1?"s":""}</span>
     </div>
     <div class="replies-section" id="replies-${p.id}" style="display:none"></div>
   </div>`;
@@ -429,6 +441,7 @@ function renderEmojiBar(reacciones, postId, replyId, isReply) {
   const emojisDefault = ["👍","❤️","🤗","😢","💪"];
   let html = "";
 
+  // Mostrar emojis que ya tienen reacciones
   Object.entries(reacciones).forEach(([emoji, data]) => {
     const yaReaccione = data.autores.includes(USUARIO);
     const cls = isReply ? "reply-emoji-btn" : "emoji-btn";
@@ -440,6 +453,7 @@ function renderEmojiBar(reacciones, postId, replyId, isReply) {
     </button>`;
   });
 
+  // Añadir emojis por defecto que aún no tienen reacciones
   if (!isReply) {
     emojisDefault.forEach(e => {
       if (!reacciones[e]) {
@@ -452,26 +466,28 @@ function renderEmojiBar(reacciones, postId, replyId, isReply) {
   return html;
 }
 
-function toggleReplies(postId) {
+// ════════════════════════════════════════════════════════════
+//  Replies
+// ════════════════════════════════════════════════════════════
+async function toggleReplies(postId) {
   const sec = document.getElementById("replies-" + postId);
   if (sec.style.display === "none") {
     sec.style.display = "block";
-    cargarReplies(postId);
+    await cargarReplies(postId);
   } else {
     sec.style.display = "none";
   }
 }
 
-function cargarReplies(postId) {
+async function cargarReplies(postId) {
   const sec = document.getElementById("replies-" + postId);
   sec.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
-  llamarAppInventor("getReplies", { post_id: postId }, (data) => {
-    if (data && data.ok) {
-      renderReplies(postId, data.replies || []);
-    } else {
-      sec.innerHTML = "<p style='padding:10px;color:var(--text2);font-size:13px'>Error al carregar.</p>";
-    }
-  });
+  try {
+    const data = await api({ action:"getReplies", post_id: postId });
+    renderReplies(postId, data.replies || []);
+  } catch(e) {
+    sec.innerHTML = "<p style='padding:10px;color:var(--text2);font-size:13px'>Error al cargar resposts.</p>";
+  }
 }
 
 function renderReplies(postId, replies) {
@@ -500,79 +516,78 @@ function renderReplies(postId, replies) {
   sec.innerHTML = lista + `
   <div class="reply-input-row">
     <textarea class="reply-input" id="reply-input-${postId}"
-      placeholder="Escriu la teva resposta…" rows="2" maxlength="300"></textarea>
+      placeholder="Escribe tu respost…" rows="2" maxlength="300"></textarea>
     <button class="reply-send" onclick="enviarReply('${postId}')">➤</button>
   </div>`;
 }
 
-function enviarReply(postId) {
+async function enviarReply(postId) {
   const inp   = document.getElementById("reply-input-" + postId);
   const texto = inp.value.trim();
   if (!texto) return;
   inp.value   = "";
   inp.disabled = true;
-  llamarAppInventor("addReply", { post_id:postId, autor:USUARIO, texto }, (data) => {
-    if (data && data.ok) {
-      cargarReplies(postId);
-      const post = postsCache.find(p => p.id === postId);
-      if (post) {
-        post.reply_count = (post.reply_count||0) + 1;
-        const el = document.querySelector(`#post-${postId} .reply-count`);
-        if (el) el.textContent = post.reply_count + " respost" + (post.reply_count!==1?"es":"");
-      }
-      mostrarToast("Resposta publicada ✓");
-    } else {
-      mostrarToast("Error al publicar");
-      inp.disabled = false;
+  try {
+    await api({ action:"addReply", post_id:postId, autor:USUARIO, texto });
+    await cargarReplies(postId);
+    // Actualizar contador en el post
+    const post = postsCache.find(p => p.id === postId);
+    if (post) {
+      post.reply_count = (post.reply_count||0) + 1;
+      const el = document.querySelector(`#post-${postId} .reply-count`);
+      if (el) el.textContent = post.reply_count + " respost" + (post.reply_count!==1?"s":"");
     }
-  });
+    mostrarToast("Respuesta publicada ✓");
+  } catch(e) {
+    mostrarToast("Error al publicar respost");
+    inp.disabled = false;
+  }
 }
 
-function toggleReaccion(postId, emoji, btn) {
-  llamarAppInventor("toggleReaction", {
-    post_id: postId, reply_id: "", autor: USUARIO, emoji
-  }, (data) => {
-    if (data && data.ok) {
-      const countEl = btn.querySelector(".emoji-count");
-      const current = parseInt(countEl.textContent)||0;
-      if (data.action === "added") {
-        btn.classList.add("reacted");
-        countEl.textContent = current + 1;
-      } else {
-        btn.classList.remove("reacted");
-        countEl.textContent = Math.max(0, current - 1);
-      }
+// ════════════════════════════════════════════════════════════
+//  Reacciones
+// ════════════════════════════════════════════════════════════
+async function toggleReaccion(postId, emoji, btn) {
+  const params = { action:"toggleReaction", post_id:postId, reply_id:"", autor:USUARIO, emoji };
+  try {
+    const data = await api(params);
+    const countEl = btn.querySelector(".emoji-count");
+    const current = parseInt(countEl.textContent)||0;
+    if (data.action === "added") {
+      btn.classList.add("reacted");
+      countEl.textContent = current + 1;
     } else {
-      mostrarToast("Error al reaccionar");
+      btn.classList.remove("reacted");
+      countEl.textContent = Math.max(0, current - 1);
     }
-  });
+  } catch(e) { mostrarToast("Error al reaccionar"); }
 }
 
-function toggleReaccionReply(postId, replyId, emoji, btn) {
-  llamarAppInventor("toggleReaction", {
-    post_id: postId, reply_id: replyId, autor: USUARIO, emoji
-  }, (data) => {
-    if (data && data.ok) {
-      const countEl = btn.querySelector(".emoji-count");
-      const current = parseInt(countEl.textContent)||0;
-      if (data.action === "added") {
-        btn.classList.add("reacted");
-        countEl.textContent = current + 1;
-      } else {
-        btn.classList.remove("reacted");
-        countEl.textContent = Math.max(0, current - 1);
-      }
+async function toggleReaccionReply(postId, replyId, emoji, btn) {
+  const params = { action:"toggleReaction", post_id:postId, reply_id:replyId, autor:USUARIO, emoji };
+  try {
+    const data = await api(params);
+    const countEl = btn.querySelector(".emoji-count");
+    const current = parseInt(countEl.textContent)||0;
+    if (data.action === "added") {
+      btn.classList.add("reacted");
+      countEl.textContent = current + 1;
     } else {
-      mostrarToast("Error al reaccionar");
+      btn.classList.remove("reacted");
+      countEl.textContent = Math.max(0, current - 1);
     }
-  });
+  } catch(e) { mostrarToast("Error al reaccionar"); }
 }
 
+// ════════════════════════════════════════════════════════════
+//  Emoji picker flotante
+// ════════════════════════════════════════════════════════════
 function abrirPicker(postId, replyId, e) {
   e.stopPropagation();
   pickerCtx = { postId, replyId };
   const picker = document.getElementById("emoji-picker");
   picker.classList.add("open");
+  // Posicionar cerca del botón
   const rect = e.target.getBoundingClientRect();
   picker.style.bottom = (window.innerHeight - rect.top + 4) + "px";
   picker.style.right  = "16px";
@@ -585,11 +600,13 @@ function elegirEmoji(emoji) {
   pickerCtx = null;
 
   if (!replyId) {
+    // Buscar botón existente o crear uno nuevo en la barra del post
     const bar = document.querySelector(`#post-${postId} .emoji-bar`);
     let btn = bar ? bar.querySelector(`[data-emoji="${emoji}"]`) : null;
     if (btn) {
       toggleReaccion(postId, emoji, btn);
     } else {
+      // Añadir botón nuevo
       if (bar) {
         const newBtn = document.createElement("button");
         newBtn.className = "emoji-btn";
@@ -601,6 +618,7 @@ function elegirEmoji(emoji) {
       }
     }
   } else {
+    // Reply
     const replyEl = document.getElementById("reply-" + replyId);
     if (!replyEl) return;
     let ebar = replyEl.querySelector(".reply-emoji-bar");
@@ -626,6 +644,9 @@ document.addEventListener("click", e => {
   }
 });
 
+// ════════════════════════════════════════════════════════════
+//  Nuevo post — modal
+// ════════════════════════════════════════════════════════════
 function abrirModal() {
   document.getElementById("modal").classList.add("open");
   document.getElementById("new-post-text").focus();
@@ -639,57 +660,59 @@ function selCat(el, cat) {
   modalCat = cat;
 }
 
-function publicarPost() {
+async function publicarPost() {
   const texto = document.getElementById("new-post-text").value.trim();
-  if (!texto) { mostrarToast("Escriu quelcom primer 😊"); return; }
+  if (!texto) { mostrarToast("Escribe algo primero 😊"); return; }
   cerrarModal();
-  llamarAppInventor("addPost", { autor:USUARIO, texto, categoria:modalCat }, (data) => {
-    if (data && data.ok) {
-      document.getElementById("new-post-text").value = "";
-      mostrarToast("¡Post publicat! 🎉");
-      cargarPosts();
-    } else {
-      mostrarToast("Error al publicar");
-    }
-  });
+  try {
+    await api({ action:"addPost", autor:USUARIO, texto, categoria:modalCat });
+    document.getElementById("new-post-text").value = "";
+    mostrarToast("¡Post publicado! 🎉");
+    cargarPosts();
+  } catch(e) {
+    mostrarToast("Error al publicar");
+  }
 }
 
-function borrarPost(id) {
-  if (!confirm("¿Eliminar aquest post?")) return;
-  llamarAppInventor("deletePost", { id }, (data) => {
-    if (data && data.ok) {
-      document.getElementById("post-" + id)?.remove();
-      mostrarToast("Post eliminat");
-    } else {
-      mostrarToast("Error al eliminar");
-    }
-  });
+// ════════════════════════════════════════════════════════════
+//  Borrar
+// ════════════════════════════════════════════════════════════
+async function borrarPost(id) {
+  if (!confirm("¿Eliminar este post?")) return;
+  try {
+    await api({ action:"deletePost", id });
+    document.getElementById("post-" + id)?.remove();
+    mostrarToast("Post eliminado");
+  } catch(e) { mostrarToast("Error al eliminar"); }
 }
 
-function borrarReply(postId, id) {
-  if (!confirm("¿Eliminar aquesta resposta?")) return;
-  llamarAppInventor("deleteReply", { id }, (data) => {
-    if (data && data.ok) {
-      document.getElementById("reply-" + id)?.remove();
-      mostrarToast("Resposta eliminada");
-    } else {
-      mostrarToast("Error al eliminar");
-    }
-  });
+async function borrarReply(postId, id) {
+  if (!confirm("¿Eliminar esta respost?")) return;
+  try {
+    await api({ action:"deleteReply", id });
+    document.getElementById("reply-" + id)?.remove();
+    mostrarToast("Respuesta eliminada");
+  } catch(e) { mostrarToast("Error al eliminar"); }
 }
 
+// ════════════════════════════════════════════════════════════
+//  Filtro de categorías
+// ════════════════════════════════════════════════════════════
 function filtrarCat(cat) {
   catActual = cat;
   document.querySelectorAll(".cat").forEach(el => {
-    el.classList.toggle("active", el.textContent.includes(cat) || (cat==="Tots" && el.textContent==="Tots"));
+    el.classList.toggle("active", el.textContent.includes(cat) || (cat==="Todos" && el.textContent==="Todos"));
   });
   cargarPosts();
 }
 
+// ════════════════════════════════════════════════════════════
+//  Utilidades
+// ════════════════════════════════════════════════════════════
 function tiempoRelativo(ts) {
   if (!ts) return "";
   const diff = (Date.now() - new Date(ts)) / 1000;
-  if (diff < 60)    return "ara";
+  if (diff < 60)    return "ahora";
   if (diff < 3600)  return Math.floor(diff/60) + " min";
   if (diff < 86400) return Math.floor(diff/3600) + " h";
   return Math.floor(diff/86400) + " d";
