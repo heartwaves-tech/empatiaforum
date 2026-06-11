@@ -372,12 +372,19 @@ document.addEventListener("DOMContentLoaded", () => {
 // ════════════════════════════════════════════════════════════
 //  API helper
 // ════════════════════════════════════════════════════════════
-async function api(params) {
-  const qs = new URLSearchParams(params).toString();
-  const target = SCRIPT_URL + "?" + qs;
-  const proxy = "https://corsproxy.io/?" + encodeURIComponent(target);
-  const res = await fetch(proxy);
-  return res.json();
+async function api(params, reintents = 3) {
+  const url = SCRIPT_URL + "?" + new URLSearchParams(params);
+  for (let i = 0; i < reintents; i++) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return await res.json();
+    } catch(e) {
+      console.warn("Intent " + (i+1) + " fallat:", e.message);
+      if (i < reintents - 1) await new Promise(r => setTimeout(r, 1000));
+    }
+  }
+  throw new Error("No s'ha pogut connectar després de " + reintents + " intents");
 }
 
 // ════════════════════════════════════════════════════════════
@@ -392,7 +399,7 @@ async function cargarPosts() {
     renderPosts(postsCache);
   } catch(e) {
     document.getElementById("feed").innerHTML =
-      '<div class="empty"><div class="icon">⚠️</div><p>No se pudo cargar el foro.<br>Revisa tu conexión.</p></div>';
+      '<div class="empty"><div class="icon">⚠️</div><p>No s'ha pogut carregar el fòrum.<br>Revisa la connexió.</p><button onclick="cargarPosts()" style="margin-top:16px;padding:10px 24px;background:#00a8d8;color:#fff;border:none;border-radius:10px;font-size:15px;cursor:pointer">🔄 Tornar a intentar</button></div>';
   }
 }
 
