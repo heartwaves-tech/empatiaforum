@@ -399,7 +399,7 @@ async function cargarPosts() {
     renderPosts(postsCache);
   } catch(e) {
     document.getElementById("feed").innerHTML =
-      '<div class="empty"><div class="icon">⚠️</div><p>No s'ha pogut carregar el fòrum.<br>Revisa la connexió.</p><button onclick="cargarPosts()" style="margin-top:16px;padding:10px 24px;background:#00a8d8;color:#fff;border:none;border-radius:10px;font-size:15px;cursor:pointer">🔄 Tornar a intentar</button></div>';
+      '<div class="empty"><div class="icon">&#9888;</div><p>No sha pogut carregar el forum. Revisa la connexio.</p><button onclick="cargarPosts()" style="margin-top:16px;padding:10px 24px;background:#00a8d8;color:#fff;border:none;border-radius:10px;font-size:15px;cursor:pointer">Tornar a intentar</button></div>';
   }
 }
 
