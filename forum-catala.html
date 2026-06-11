@@ -340,22 +340,22 @@
 
 <script>
 // ════════════════════════════════════════════════════════════
-//  CONFIGURACIÓN — edita estas dos líneas
+//  CONFIGURACIÓ
 // ════════════════════════════════════════════════════════════
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhluN7Oh2iKIaSkBUGl2hxAs0qjGsUn7kRpXRhZjPW4azIs1n1Ow-OqAYfeamafEmi/exec";
-let   USUARIO    = "Usuario"; // se sobreescribe desde App Inventor
+const SCRIPT_URL  = "https://script.google.com/macros/s/AKfycbwhluN7Oh2iKIaSkBUGl2hxAs0qjGsUn7kRpXRhZjPW4azIs1n1Ow-OqAYfeamafEmi/exec";
+const PROXY_URL   = "https://empatia-proxy.heartwaves.workers.dev";
+let   USUARIO     = "Usuario"; // se sobreescribe desde App Inventor
 
 // ════════════════════════════════════════════════════════════
 //  Estado global
 // ════════════════════════════════════════════════════════════
 let catActual  = "Tots";
 let modalCat   = "Suport";
-let pickerCtx  = null; // { postId, replyId }
+let pickerCtx  = null;
 let postsCache = [];
 
 // ════════════════════════════════════════════════════════════
 //  Recibir usuario desde App Inventor
-//  En App Inventor: WebViewer1.WebViewString = nombreUsuario
 // ════════════════════════════════════════════════════════════
 document.addEventListener("DOMContentLoaded", () => {
   try {
@@ -370,13 +370,15 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ════════════════════════════════════════════════════════════
-//  API helper
+//  API helper — totes les crides passen pel proxy Cloudflare
 // ════════════════════════════════════════════════════════════
 async function api(params, reintents = 3) {
-  const url = SCRIPT_URL + "?" + new URLSearchParams(params);
+  const targetUrl = SCRIPT_URL + "?" + new URLSearchParams(params);
+  const proxyUrl  = PROXY_URL + "?url=" + encodeURIComponent(targetUrl);
+
   for (let i = 0; i < reintents; i++) {
     try {
-      const res = await fetch(url);
+      const res = await fetch(proxyUrl);
       if (!res.ok) throw new Error("HTTP " + res.status);
       return await res.json();
     } catch(e) {
@@ -399,14 +401,14 @@ async function cargarPosts() {
     renderPosts(postsCache);
   } catch(e) {
     document.getElementById("feed").innerHTML =
-      '<div class="empty"><div class="icon">&#9888;</div><p>No sha pogut carregar el forum. Revisa la connexio.</p><button onclick="cargarPosts()" style="margin-top:16px;padding:10px 24px;background:#00a8d8;color:#fff;border:none;border-radius:10px;font-size:15px;cursor:pointer">Tornar a intentar</button></div>';
+      '<div class="empty"><div class="icon">&#9888;</div><p>No s\'ha pogut carregar el fòrum. Revisa la connexió.</p><button onclick="cargarPosts()" style="margin-top:16px;padding:10px 24px;background:#00a8d8;color:#fff;border:none;border-radius:10px;font-size:15px;cursor:pointer">🔄 Tornar a intentar</button></div>';
   }
 }
 
 function renderPosts(posts) {
   const feed = document.getElementById("feed");
   if (!posts.length) {
-    feed.innerHTML = '<div class="empty"><div class="icon">🌱</div><p>Aún no hay posts en esta categoría.<br>¡Sé el primero en compartir!</p></div>';
+    feed.innerHTML = '<div class="empty"><div class="icon">🌱</div><p>Encara no hi ha posts en aquesta categoria.<br>Sigues el primer a compartir!</p></div>';
     return;
   }
   feed.innerHTML = posts.map(p => renderPostCard(p)).join("");
@@ -434,13 +436,13 @@ function renderPostCard(p) {
     </div>
     <div class="emoji-bar">
       ${emojisBtns}
-      <button class="emoji-add" onclick="abrirPicker('${p.id}','',event)" title="Añadir reacción">＋😊</button>
+      <button class="emoji-add" onclick="abrirPicker('${p.id}','',event)" title="Afegir reacció">＋😊</button>
     </div>
     <div class="post-footer">
       <button class="btn-reply" onclick="toggleReplies('${p.id}')">
         💬 Respondre
       </button>
-      <span class="reply-count">${p.reply_count} respost${p.reply_count!==1?"s":""}</span>
+      <span class="reply-count">${p.reply_count} respost${p.reply_count!==1?"es":""}</span>
     </div>
     <div class="replies-section" id="replies-${p.id}" style="display:none"></div>
   </div>`;
@@ -450,7 +452,6 @@ function renderEmojiBar(reacciones, postId, replyId, isReply) {
   const emojisDefault = ["👍","❤️","🤗","😢","💪"];
   let html = "";
 
-  // Mostrar emojis que ya tienen reacciones
   Object.entries(reacciones).forEach(([emoji, data]) => {
     const yaReaccione = data.autores.includes(USUARIO);
     const cls = isReply ? "reply-emoji-btn" : "emoji-btn";
@@ -462,7 +463,6 @@ function renderEmojiBar(reacciones, postId, replyId, isReply) {
     </button>`;
   });
 
-  // Añadir emojis por defecto que aún no tienen reacciones
   if (!isReply) {
     emojisDefault.forEach(e => {
       if (!reacciones[e]) {
@@ -525,7 +525,7 @@ function renderReplies(postId, replies) {
   sec.innerHTML = lista + `
   <div class="reply-input-row">
     <textarea class="reply-input" id="reply-input-${postId}"
-      placeholder="Escriu la teva respost…" rows="2" maxlength="300"></textarea>
+      placeholder="Escriu la teva resposta…" rows="2" maxlength="300"></textarea>
     <button class="reply-send" onclick="enviarReply('${postId}')">➤</button>
   </div>`;
 }
@@ -534,21 +534,20 @@ async function enviarReply(postId) {
   const inp   = document.getElementById("reply-input-" + postId);
   const texto = inp.value.trim();
   if (!texto) return;
-  inp.value   = "";
+  inp.value    = "";
   inp.disabled = true;
   try {
     await api({ action:"addReply", post_id:postId, autor:USUARIO, texto });
     await cargarReplies(postId);
-    // Actualizar contador en el post
     const post = postsCache.find(p => p.id === postId);
     if (post) {
       post.reply_count = (post.reply_count||0) + 1;
       const el = document.querySelector(`#post-${postId} .reply-count`);
-      if (el) el.textContent = post.reply_count + " respost" + (post.reply_count!==1?"s":"");
+      if (el) el.textContent = post.reply_count + " respost" + (post.reply_count!==1?"es":"");
     }
     mostrarToast("Resposta publicada ✓");
   } catch(e) {
-    mostrarToast("Error al publicar respost");
+    mostrarToast("Error al publicar la resposta");
     inp.disabled = false;
   }
 }
@@ -596,7 +595,6 @@ function abrirPicker(postId, replyId, e) {
   pickerCtx = { postId, replyId };
   const picker = document.getElementById("emoji-picker");
   picker.classList.add("open");
-  // Posicionar cerca del botón
   const rect = e.target.getBoundingClientRect();
   picker.style.bottom = (window.innerHeight - rect.top + 4) + "px";
   picker.style.right  = "16px";
@@ -609,13 +607,11 @@ function elegirEmoji(emoji) {
   pickerCtx = null;
 
   if (!replyId) {
-    // Buscar botón existente o crear uno nuevo en la barra del post
     const bar = document.querySelector(`#post-${postId} .emoji-bar`);
     let btn = bar ? bar.querySelector(`[data-emoji="${emoji}"]`) : null;
     if (btn) {
       toggleReaccion(postId, emoji, btn);
     } else {
-      // Añadir botón nuevo
       if (bar) {
         const newBtn = document.createElement("button");
         newBtn.className = "emoji-btn";
@@ -627,7 +623,6 @@ function elegirEmoji(emoji) {
       }
     }
   } else {
-    // Reply
     const replyEl = document.getElementById("reply-" + replyId);
     if (!replyEl) return;
     let ebar = replyEl.querySelector(".reply-emoji-bar");
@@ -696,11 +691,11 @@ async function borrarPost(id) {
 }
 
 async function borrarReply(postId, id) {
-  if (!confirm("Eliminar aquesta respost?")) return;
+  if (!confirm("Eliminar aquesta resposta?")) return;
   try {
     await api({ action:"deleteReply", id });
     document.getElementById("reply-" + id)?.remove();
-    mostrarToast("Respost eliminada");
+    mostrarToast("Resposta eliminada");
   } catch(e) { mostrarToast("Error al eliminar"); }
 }
 
@@ -710,18 +705,18 @@ async function borrarReply(postId, id) {
 function filtrarCat(cat) {
   catActual = cat;
   document.querySelectorAll(".cat").forEach(el => {
-    el.classList.toggle("active", el.textContent.includes(cat) || (cat==="Todos" && el.textContent==="Todos"));
+    el.classList.toggle("active", el.textContent.includes(cat) || (cat==="Tots" && el.textContent==="Tots"));
   });
   cargarPosts();
 }
 
 // ════════════════════════════════════════════════════════════
-//  Utilidades
+//  Utilitats
 // ════════════════════════════════════════════════════════════
 function tiempoRelativo(ts) {
   if (!ts) return "";
   const diff = (Date.now() - new Date(ts)) / 1000;
-  if (diff < 60)    return "ahora";
+  if (diff < 60)    return "ara";
   if (diff < 3600)  return Math.floor(diff/60) + " min";
   if (diff < 86400) return Math.floor(diff/3600) + " h";
   return Math.floor(diff/86400) + " d";
